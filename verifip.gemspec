@@ -1,6 +1,8 @@
+require_relative "lib/verifip/version"
+
 Gem::Specification.new do |s|
   s.name          = "verifip"
-  s.version       = "0.1.0"
+  s.version       = VerifIP::VERSION
   s.summary       = "Official Ruby SDK for the VerifIP IP fraud scoring API"
   s.description   = "Ruby client library for the VerifIP API. Check IP addresses " \
                      "for fraud risk, VPN/proxy/Tor detection, geolocation, and more."
