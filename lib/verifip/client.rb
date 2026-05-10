@@ -78,6 +78,89 @@ module VerifIP
       HealthResponse.from_hash(data)
     end
 
+    # Check an email address for fraud risk.
+    #
+    # @param email [String] email address to check
+    # @return [EmailResponse]
+    def check_email(email)
+      raise ArgumentError, "email is required" if email.nil? || email.empty?
+
+      data = request(:get, "/v1/email?email=#{URI.encode_uri_component(email)}", auth: true)
+      EmailResponse.from_hash(data)
+    end
+
+    # Check a phone number for fraud risk.
+    #
+    # @param phone [String] phone number to check
+    # @return [PhoneResponse]
+    def check_phone(phone)
+      raise ArgumentError, "phone is required" if phone.nil? || phone.empty?
+
+      data = request(:get, "/v1/phone?phone=#{URI.encode_uri_component(phone)}", auth: true)
+      PhoneResponse.from_hash(data)
+    end
+
+    # Check a URL for fraud risk.
+    #
+    # @param url [String] URL to check
+    # @return [URLResponse]
+    def check_url(url)
+      raise ArgumentError, "url is required" if url.nil? || url.empty?
+
+      data = request(:get, "/v1/url?url=#{URI.encode_uri_component(url)}", auth: true)
+      URLResponse.from_hash(data)
+    end
+
+    # Perform a WHOIS lookup for an IP address.
+    #
+    # @param ip [String] IPv4 or IPv6 address
+    # @return [WHOISResponse]
+    def check_whois(ip)
+      raise ArgumentError, "ip is required" if ip.nil? || ip.empty?
+
+      data = request(:get, "/v1/whois?ip=#{URI.encode_uri_component(ip)}", auth: true)
+      WHOISResponse.from_hash(data)
+    end
+
+    # Submit a fraud report for an IP address.
+    #
+    # @param ip [String] IPv4 or IPv6 address
+    # @param is_fraud [Boolean] whether the IP was used for fraud
+    # @param category [String] optional fraud category
+    # @param comment [String] optional comment
+    # @return [ReportResponse]
+    def report(ip, is_fraud, category: "", comment: "")
+      raise ArgumentError, "ip is required" if ip.nil? || ip.empty?
+
+      payload = { ip: ip, is_fraud: is_fraud }
+      payload[:category] = category unless category.empty?
+      payload[:comment] = comment unless comment.empty?
+
+      body = JSON.generate(payload)
+      data = request(:post, "/v1/report", body: body, auth: true)
+      ReportResponse.from_hash(data)
+    end
+
+    # Perform a multi-signal risk assessment.
+    #
+    # @param ip [String] optional IP address
+    # @param email [String] optional email address
+    # @param phone [String] optional phone number
+    # @param url [String] optional URL
+    # @return [AssessResponse]
+    def assess(ip: "", email: "", phone: "", url: "")
+      params = []
+      params << "ip=#{URI.encode_uri_component(ip)}" unless ip.empty?
+      params << "email=#{URI.encode_uri_component(email)}" unless email.empty?
+      params << "phone=#{URI.encode_uri_component(phone)}" unless phone.empty?
+      params << "url=#{URI.encode_uri_component(url)}" unless url.empty?
+
+      raise ArgumentError, "at least one parameter is required" if params.empty?
+
+      data = request(:get, "/v1/assess?#{params.join('&')}", auth: true)
+      AssessResponse.from_hash(data)
+    end
+
     def to_s = "VerifIP::Client(base_url=#{@base_url})"
     def inspect = to_s
 

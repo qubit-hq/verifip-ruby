@@ -115,6 +115,246 @@ module VerifIP
     def inspect = to_s
   end
 
+  # Response from an email risk check.
+  class EmailResponse
+    FIELDS = %i[
+      request_id email risk_score valid_syntax mx_found is_disposable
+      is_free_provider is_role_based domain_age_days domain
+      signal_breakdown error
+    ].freeze
+
+    attr_reader(*FIELDS)
+
+    def initialize(**kwargs)
+      @request_id       = kwargs.fetch(:request_id, "")
+      @email            = kwargs.fetch(:email, "")
+      @risk_score       = kwargs.fetch(:risk_score, 0)
+      @valid_syntax     = kwargs.fetch(:valid_syntax, false)
+      @mx_found         = kwargs.fetch(:mx_found, false)
+      @is_disposable    = kwargs.fetch(:is_disposable, false)
+      @is_free_provider = kwargs.fetch(:is_free_provider, false)
+      @is_role_based    = kwargs.fetch(:is_role_based, false)
+      @domain_age_days  = kwargs.fetch(:domain_age_days, 0)
+      @domain           = kwargs.fetch(:domain, "")
+      @signal_breakdown = kwargs.fetch(:signal_breakdown, {})
+      @error            = kwargs.fetch(:error, nil)
+    end
+
+    def self.from_hash(hash)
+      hash = _symbolize(hash)
+      new(**hash.slice(*FIELDS))
+    end
+
+    def to_h
+      FIELDS.each_with_object({}) { |f, h| h[f] = send(f) }
+    end
+
+    def to_s = "EmailResponse(email=#{@email}, risk_score=#{@risk_score})"
+    def inspect = to_s
+
+    def self._symbolize(hash)
+      hash.each_with_object({}) { |(k, v), h| h[k.to_sym] = v }
+    end
+    private_class_method :_symbolize
+  end
+
+  # Response from a phone number risk check.
+  class PhoneResponse
+    FIELDS = %i[
+      request_id phone risk_score valid country_code carrier
+      line_type is_voip signal_breakdown error
+    ].freeze
+
+    attr_reader(*FIELDS)
+
+    def initialize(**kwargs)
+      @request_id       = kwargs.fetch(:request_id, "")
+      @phone            = kwargs.fetch(:phone, "")
+      @risk_score       = kwargs.fetch(:risk_score, 0)
+      @valid            = kwargs.fetch(:valid, false)
+      @country_code     = kwargs.fetch(:country_code, "")
+      @carrier          = kwargs.fetch(:carrier, "")
+      @line_type        = kwargs.fetch(:line_type, "")
+      @is_voip          = kwargs.fetch(:is_voip, false)
+      @signal_breakdown = kwargs.fetch(:signal_breakdown, {})
+      @error            = kwargs.fetch(:error, nil)
+    end
+
+    def self.from_hash(hash)
+      hash = _symbolize(hash)
+      new(**hash.slice(*FIELDS))
+    end
+
+    def voip? = @is_voip
+
+    def to_h
+      FIELDS.each_with_object({}) { |f, h| h[f] = send(f) }
+    end
+
+    def to_s = "PhoneResponse(phone=#{@phone}, risk_score=#{@risk_score})"
+    def inspect = to_s
+
+    def self._symbolize(hash)
+      hash.each_with_object({}) { |(k, v), h| h[k.to_sym] = v }
+    end
+    private_class_method :_symbolize
+  end
+
+  # Response from a URL risk check.
+  class URLResponse
+    FIELDS = %i[
+      request_id url risk_score is_phishing is_malware
+      safe_browsing_threat in_phishtank spamhaus_dbl domain_age_days
+      ssl_valid ssl_issuer signal_breakdown error
+    ].freeze
+
+    attr_reader(*FIELDS)
+
+    def initialize(**kwargs)
+      @request_id           = kwargs.fetch(:request_id, "")
+      @url                  = kwargs.fetch(:url, "")
+      @risk_score           = kwargs.fetch(:risk_score, 0)
+      @is_phishing          = kwargs.fetch(:is_phishing, false)
+      @is_malware           = kwargs.fetch(:is_malware, false)
+      @safe_browsing_threat = kwargs.fetch(:safe_browsing_threat, "")
+      @in_phishtank         = kwargs.fetch(:in_phishtank, false)
+      @spamhaus_dbl         = kwargs.fetch(:spamhaus_dbl, false)
+      @domain_age_days      = kwargs.fetch(:domain_age_days, 0)
+      @ssl_valid            = kwargs.fetch(:ssl_valid, false)
+      @ssl_issuer           = kwargs.fetch(:ssl_issuer, "")
+      @signal_breakdown     = kwargs.fetch(:signal_breakdown, {})
+      @error                = kwargs.fetch(:error, nil)
+    end
+
+    def self.from_hash(hash)
+      hash = _symbolize(hash)
+      new(**hash.slice(*FIELDS))
+    end
+
+    def phishing? = @is_phishing
+    def malware?  = @is_malware
+
+    def to_h
+      FIELDS.each_with_object({}) { |f, h| h[f] = send(f) }
+    end
+
+    def to_s = "URLResponse(url=#{@url}, risk_score=#{@risk_score})"
+    def inspect = to_s
+
+    def self._symbolize(hash)
+      hash.each_with_object({}) { |(k, v), h| h[k.to_sym] = v }
+    end
+    private_class_method :_symbolize
+  end
+
+  # Response from a WHOIS lookup.
+  class WHOISResponse
+    FIELDS = %i[
+      request_id ip network_cidr network_name org_name abuse_contact
+      rir allocation_date country_code asn asn_org
+    ].freeze
+
+    attr_reader(*FIELDS)
+
+    def initialize(**kwargs)
+      @request_id      = kwargs.fetch(:request_id, "")
+      @ip              = kwargs.fetch(:ip, "")
+      @network_cidr    = kwargs.fetch(:network_cidr, "")
+      @network_name    = kwargs.fetch(:network_name, "")
+      @org_name        = kwargs.fetch(:org_name, "")
+      @abuse_contact   = kwargs.fetch(:abuse_contact, "")
+      @rir             = kwargs.fetch(:rir, "")
+      @allocation_date = kwargs.fetch(:allocation_date, "")
+      @country_code    = kwargs.fetch(:country_code, "")
+      @asn             = kwargs.fetch(:asn, 0)
+      @asn_org         = kwargs.fetch(:asn_org, "")
+    end
+
+    def self.from_hash(hash)
+      hash = _symbolize(hash)
+      new(**hash.slice(*FIELDS))
+    end
+
+    def to_h
+      FIELDS.each_with_object({}) { |f, h| h[f] = send(f) }
+    end
+
+    def to_s = "WHOISResponse(ip=#{@ip}, network_cidr=#{@network_cidr})"
+    def inspect = to_s
+
+    def self._symbolize(hash)
+      hash.each_with_object({}) { |(k, v), h| h[k.to_sym] = v }
+    end
+    private_class_method :_symbolize
+  end
+
+  # Response from a fraud report submission.
+  class ReportResponse
+    FIELDS = %i[request_id status message].freeze
+
+    attr_reader(*FIELDS)
+
+    def initialize(**kwargs)
+      @request_id = kwargs.fetch(:request_id, "")
+      @status     = kwargs.fetch(:status, "")
+      @message    = kwargs.fetch(:message, "")
+    end
+
+    def self.from_hash(hash)
+      hash = _symbolize(hash)
+      new(**hash.slice(*FIELDS))
+    end
+
+    def to_h
+      FIELDS.each_with_object({}) { |f, h| h[f] = send(f) }
+    end
+
+    def to_s = "ReportResponse(status=#{@status}, message=#{@message})"
+    def inspect = to_s
+
+    def self._symbolize(hash)
+      hash.each_with_object({}) { |(k, v), h| h[k.to_sym] = v }
+    end
+    private_class_method :_symbolize
+  end
+
+  # Response from a multi-signal risk assessment.
+  class AssessResponse
+    FIELDS = %i[request_id overall_risk ip email phone url].freeze
+
+    attr_reader(*FIELDS)
+
+    def initialize(**kwargs)
+      @request_id  = kwargs.fetch(:request_id, "")
+      @overall_risk = kwargs.fetch(:overall_risk, 0)
+      @ip          = kwargs.fetch(:ip, nil)
+      @email       = kwargs.fetch(:email, nil)
+      @phone       = kwargs.fetch(:phone, nil)
+      @url         = kwargs.fetch(:url, nil)
+    end
+
+    def self.from_hash(hash)
+      hash = _symbolize(hash)
+      hash[:ip]    = CheckResponse.from_hash(hash[:ip]) if hash[:ip].is_a?(Hash)
+      hash[:email] = EmailResponse.from_hash(hash[:email]) if hash[:email].is_a?(Hash)
+      hash[:phone] = PhoneResponse.from_hash(hash[:phone]) if hash[:phone].is_a?(Hash)
+      hash[:url]   = URLResponse.from_hash(hash[:url]) if hash[:url].is_a?(Hash)
+      new(**hash.slice(*FIELDS))
+    end
+
+    def to_h
+      FIELDS.each_with_object({}) { |f, h| h[f] = send(f) }
+    end
+
+    def to_s = "AssessResponse(overall_risk=#{@overall_risk})"
+    def inspect = to_s
+
+    def self._symbolize(hash)
+      hash.each_with_object({}) { |(k, v), h| h[k.to_sym] = v }
+    end
+    private_class_method :_symbolize
+  end
+
   # Rate limit information parsed from response headers.
   class RateLimitInfo
     # @return [Integer] maximum requests in the current window
